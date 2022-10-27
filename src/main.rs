@@ -1,6 +1,7 @@
-mod db;
+use diesel::prelude::*;
+use todo::establish_connection;
 
-use db::establish_connection;
+
 fn main() {
     let connection = &mut establish_connection();
     println!("Hello, world!");
