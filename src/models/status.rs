@@ -1,6 +1,13 @@
 //An enum to track the status of the 'todo' entries
+#[derive(Clone)]
 pub enum Status {
-    Abandoned,
+    _Abandoned,
     Active,
-    Done,
+    _Done,
+}
+
+impl Default for Status {
+    fn default() -> Self {
+        Self::Active
+    }
 }
