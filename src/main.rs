@@ -1,5 +1,6 @@
-mod db;
+pub mod db;
 mod models;
+pub mod schema;
 
 use clap::Parser;
 use db::establish_connection;
@@ -18,23 +19,21 @@ fn main() {
         Some(Commands::Create) => {
             println!("Enter title of the entry:");
             match io::stdin().read_line(&mut entry.title) {
-                Ok(_) => {
-                    println!("{}", entry.title)
-                }
-                Err(error) => println!("error: {error}"),
+                Ok(_) => {}
+                Err(error) => println!("error: {}", error),
             }
             println!("Enter description:");
             match io::stdin().read_line(&mut entry.description) {
-                Ok(_) => {
-                    println!("{}", entry.description)
-                }
-                Err(error) => println!("error: {error}"),
+                Ok(_) => {}
+                Err(error) => println!("error: {}", error),
             }
+            println!("{}", entry.title);
+            println!("{}", entry.description);
         }
         Some(Commands::Delete) => println!("command: delete"),
         Some(Commands::Edit) => println!("command: edit"),
         Some(Commands::Update) => println!("command: update"),
         Some(Commands::Read) => println!("command: read"),
-        None => println!("Invalid command: try again."),
+        None => {},
     };
 }
