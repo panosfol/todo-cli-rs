@@ -2,9 +2,9 @@
 
 diesel::table! {
     todos (id) {
-        id -> Unsigned<Bigint>,
+        id -> Integer,
         title -> Varchar,
         description -> Text,
-        status -> Tinytext,
+        status -> Text,
     }
 }
