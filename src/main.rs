@@ -7,7 +7,7 @@ use db::{create_entry, delete_entry, edit_entry, establish_connection, get_entri
 use dialoguer::{theme::ColorfulTheme, Select};
 use models::{
     cli::{Cli, Commands},
-    entry::{EditedEntry, Entry, NewEntry},
+    entry::{EditedEntry, NewEntry},
 };
 use std::io;
 
