@@ -131,13 +131,22 @@ fn main() {
                     println!("{}", err);
                 }
             }
-            let entries_title: Vec<String> = entries.as_ref().unwrap().clone().into_iter().map(|p| p.title).collect();
+            let entries_title: Vec<String> = entries
+                .as_ref()
+                .unwrap()
+                .clone()
+                .into_iter()
+                .map(|p| p.title)
+                .collect();
             let selection_entries = Select::with_theme(&ColorfulTheme::default())
                 .with_prompt("Pick an entry to read description")
                 .items(&entries_title[..])
                 .interact()
                 .unwrap();
-            println!("{}", entries.unwrap().clone()[selection_entries].description);
+            println!(
+                "{}",
+                entries.unwrap().clone()[selection_entries].description
+            );
         }
         None => {}
     };
