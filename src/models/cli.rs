@@ -14,13 +14,13 @@ pub struct Cli {
 #[derive(Subcommand, Debug)]
 pub enum Commands {
     /// Submit a todo entry
-    Create,
+    New,
     /// Read all the entries
-    Read,
+    Ls,
     /// Edit a specific entry
     Edit,
     /// Delete a specific entry
     Delete,
     /// Update the status of an entry
-    Update,
+    Status,
 }
