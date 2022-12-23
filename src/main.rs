@@ -61,60 +61,68 @@ fn main() {
 			let selection = Select::with_theme(&ColorfulTheme::default())
 				.with_prompt("Pick an entry to delete")
 				.items(&entries_title[..])
-				.interact()
-				.unwrap();
+				.interact();
 
-			delete_entry(connection, entries_title[selection].clone());
-		},
-
-		Some(Commands::Edit) => {
-			let entries = get_entries(connection).unwrap();
-			let mut edited_entry = EditedEntry::default();
-			let entries_title: Vec<String> = entries.into_iter().map(|p| p.title).collect();
-			let entry_fields = &["Title", "Description", "Both"];
-			let selection_entries = Select::with_theme(&ColorfulTheme::default())
-				.with_prompt("Pick an entry to edit")
-				.items(&entries_title[..])
-				.interact()
-				.unwrap();
-			let selection_edit = Select::with_theme(&ColorfulTheme::default())
-				.with_prompt("Pick a field to edit")
-				.items(&entry_fields[..])
-				.interact()
-				.unwrap();
-			match selection_edit {
-				0 => {
-					println!("Give new title for chosen entry:");
-					match io::stdin().read_line(&mut edited_entry.title) {
-						Ok(_) => {},
-						Err(error) => println!("error: {}", error),
-					}
+			match selection {
+				Ok(selected) => {
+					delete_entry(connection, entries_title[selected].clone());
 				},
-				1 => {
-					println!("Give new description for chosen entry:");
-					match io::stdin().read_line(&mut edited_entry.description) {
-						Ok(_) => {},
-						Err(error) => println!("error: {}", error),
-					}
+				Err(error) => {
+					println!("error: {}", error)
 				},
-				2 => {
-					println!("Give new title for chosen entry:");
-					match io::stdin().read_line(&mut edited_entry.title) {
-						Ok(_) => {},
-						Err(error) => println!("error: {}", error),
-					}
-					println!("Give new description for chosen entry:");
-					match io::stdin().read_line(&mut edited_entry.description) {
-						Ok(_) => {},
-						Err(error) => println!("error: {}", error),
-					}
-				},
-				_ => (),
 			}
-			edited_entry.title = edited_entry.title.trim().to_string();
-			edited_entry.description = edited_entry.description.trim().to_string();
-			edit_entry(connection, entries_title[selection_entries].clone(), edited_entry)
 		},
+
+	    Some(Commands::Edit) => {
+		let entries = get_entries(connection).unwrap();
+		let mut edited_entry = EditedEntry::default();
+		let entries_title: Vec<String> = entries.into_iter().map(|p| p.title).collect();
+		let entry_fields = &["Title", "Description", "Both"];
+		let selection_entries = Select::with_theme(&ColorfulTheme::default())
+		    .with_prompt("Pick an entry to edit")
+		    .items(&entries_title[..])
+		    .interact()
+                    .unwrap();
+
+		let selection_edit = Select::with_theme(&ColorfulTheme::default())
+		    .with_prompt("Pick a field to edit")
+		    .items(&entry_fields[..])
+		    .interact()
+                    .unwrap();
+
+		match selection_edit {
+		    0 => {
+			println!("Give new title for chosen entry:");
+			match io::stdin().read_line(&mut edited_entry.title) {
+			    Ok(_) => {},
+			    Err(error) => println!("error: {}", error),
+			}
+		    },
+		    1 => {
+			println!("Give new description for chosen entry:");
+			match io::stdin().read_line(&mut edited_entry.description) {
+			    Ok(_) => {},
+			    Err(error) => println!("error: {}", error),
+			}
+		    },
+		    2 => {
+			println!("Give new title for chosen entry:");
+			match io::stdin().read_line(&mut edited_entry.title) {
+			    Ok(_) => {},
+			    Err(error) => println!("error: {}", error),
+			}
+			println!("Give new description for chosen entry:");
+			match io::stdin().read_line(&mut edited_entry.description) {
+			    Ok(_) => {},
+			    Err(error) => println!("error: {}", error),
+			}
+		    },
+		    _ => (),
+		}
+		edited_entry.title = edited_entry.title.trim().to_string();
+		edited_entry.description = edited_entry.description.trim().to_string();
+		edit_entry(connection, entries_title[selection_entries].clone(), edited_entry)
+	    },
 
 		Some(Commands::Status) => {
 			let entries = get_entries(connection).unwrap();
@@ -148,6 +156,7 @@ fn main() {
 					println!("{}", err);
 				},
 			}
+
 			let entries_title: Vec<String> =
 				entries.as_ref().unwrap().clone().into_iter().map(|p| p.title).collect();
 			let selection_entries = Select::with_theme(&ColorfulTheme::default())
