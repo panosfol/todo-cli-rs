@@ -37,10 +37,14 @@ pub fn update_entry(conn: &mut MysqlConnection, entry_title: String, status: Str
 		.execute(conn)
 		.unwrap();
 }
-pub fn edit_entry(conn: &mut MysqlConnection, entry_title: String, new_entry: EditedEntry) -> () {
+pub fn edit_entry(
+	conn: &mut MysqlConnection,
+	entry_title: String,
+	updated_entry: EditedEntry,
+) -> () {
 	diesel::update(dsl::todos)
 		.filter(dsl::title.eq(entry_title))
-		.set::<EditedEntry>(new_entry)
+		.set::<EditedEntry>(updated_entry)
 		.execute(conn)
 		.unwrap();
 }
