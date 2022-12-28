@@ -141,8 +141,8 @@ fn main() {
 						.interact();
 					match selection_entries {
 						Ok(selected) => {
-							//Saving both the title and the description of the selected entry
-							//so that they can be used later according to the user selection
+							/*Saving both the title and the description of the selected entry
+							so that they can be used later according to the user selection*/
 							let selected_title = &entries[selected].title;
 							let selected_desc = &entries[selected].description;
 							//Developing a selectable menu of the selectable fields
@@ -157,8 +157,8 @@ fn main() {
 									println!("Give new title for chosen entry:");
 									match io::stdin().read_line(&mut edited_entry.title) {
 										Ok(_) => {
-											//The edited_entry struct holds the new title, but the already existing description,
-											//so that the title will be updated but the description can stay the same
+											/*The edited_entry struct holds the new title, but the already existing description,
+											so that the title will be updated but the description can stay the same*/
 											edited_entry.title =
 												edited_entry.title.trim().to_string();
 											edited_entry.description = selected_desc.to_string();
@@ -175,8 +175,8 @@ fn main() {
 									println!("Give new description for chosen entry:");
 									match io::stdin().read_line(&mut edited_entry.description) {
 										Ok(_) => {
-											//The edited_entry struct holds the new description, but the already existing title,
-											//so that the description will be updated but the title can stay the same
+											/*The edited_entry struct holds the new description, but the already existing title,
+											so that the description will be updated but the title can stay the same*/
 											edited_entry.description =
 												edited_entry.description.trim().to_string();
 											edited_entry.title = selected_title.to_string();
