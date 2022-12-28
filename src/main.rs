@@ -39,7 +39,6 @@ pub enum Commands {
 	/// Update the status of an entry
 	Status,
 }
-
 #[derive(Parser, Debug)]
 pub struct Flag {
 	///Fetch only the entries type <CATEGORY>
