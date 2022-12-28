@@ -26,9 +26,9 @@ pub struct Cli {
 
 #[derive(Subcommand, Debug)]
 pub enum Commands {
-	/// Submit a todo entry
+	/// Submit a todo entry. Type --help for additional options
 	New(Flag),
-	/// Read all the entries
+	/// Read all the entries. Type --help for additional options
 	#[clap(alias = "list")]
 	Ls(Flag),
 	/// Edit a specific entry
@@ -52,13 +52,14 @@ pub struct Flag {
 fn main() {
 	let connection = &mut establish_connection();
 	let cli = Cli::parse();
-
+	//This is where the main function of the app takes place
 	match cli.command {
 		Some(Commands::New(flag)) => {
 			let mut new_entry = NewEntry::default();
-
+			//Matching the flag struct to parse the category of the new entry
 			match flag.category {
 				Some(mut categ) => {
+					//Converting the first letter to make matching easier and consistent
 					uppercase_converter(&mut categ);
 					match categ.as_str() {
 						"Fun" => {
@@ -76,6 +77,7 @@ fn main() {
 						},
 					}
 				},
+				//If the user doesn't input -c <Category> "Other" is applied automatically
 				None => {
 					new_entry.category = "Other".to_string();
 				},
@@ -92,14 +94,18 @@ fn main() {
 			}
 			new_entry.title = new_entry.title.trim().to_string();
 			new_entry.description = new_entry.description.trim().to_string();
+			//Status is automatically "Active" for every new entry
 			new_entry.status = "Active".to_string();
 			create_entry(connection, new_entry);
 		},
 
 		Some(Commands::Delete) => {
+			//Fetching all the entries to develop the selectable menu
 			let entries = get_entries(connection);
+			//Matching the "entries" vector because the load function of the diesel returns result
 			match entries {
 				Ok(entries) => {
+					//Gathering the titles in a vector and using that vector for the selectable menu
 					let entries_title: Vec<String> = entries.into_iter().map(|p| p.title).collect();
 					let selection = Select::with_theme(&ColorfulTheme::default())
 						.with_prompt("Pick an entry to delete")
@@ -120,7 +126,6 @@ fn main() {
 				},
 			}
 		},
-
 		Some(Commands::Edit) => {
 			let entries = get_entries(connection);
 			match entries {
@@ -128,6 +133,7 @@ fn main() {
 					let mut edited_entry = EditedEntry::default();
 					let entries_title: Vec<String> =
 						entries.clone().into_iter().map(|p| p.title).collect();
+					//Selectable fields are hardcoded, so that the entry fields will have consistency
 					let selectable_fields = &["Title", "Description", "Both"];
 					let selection_entries = Select::with_theme(&ColorfulTheme::default())
 						.with_prompt("Pick an entry to edit")
@@ -135,8 +141,11 @@ fn main() {
 						.interact();
 					match selection_entries {
 						Ok(selected) => {
+							//Saving both the title and the description of the selected entry
+							//so that they can be used later according to the user selection
 							let selected_title = &entries[selected].title;
 							let selected_desc = &entries[selected].description;
+							//Developing a selectable menu of the selectable fields
 							let selection_edit = Select::with_theme(&ColorfulTheme::default())
 								.with_prompt("Pick a field to edit")
 								.items(&selectable_fields[..])
@@ -148,6 +157,8 @@ fn main() {
 									println!("Give new title for chosen entry:");
 									match io::stdin().read_line(&mut edited_entry.title) {
 										Ok(_) => {
+											//The edited_entry struct holds the new title, but the already existing description,
+											//so that the title will be updated but the description can stay the same
 											edited_entry.title =
 												edited_entry.title.trim().to_string();
 											edited_entry.description = selected_desc.to_string();
@@ -164,6 +175,8 @@ fn main() {
 									println!("Give new description for chosen entry:");
 									match io::stdin().read_line(&mut edited_entry.description) {
 										Ok(_) => {
+											//The edited_entry struct holds the new description, but the already existing title,
+											//so that the description will be updated but the title can stay the same
 											edited_entry.description =
 												edited_entry.description.trim().to_string();
 											edited_entry.title = selected_title.to_string();
@@ -218,6 +231,7 @@ fn main() {
 				Ok(entries) => {
 					let entries_title: Vec<String> =
 						entries.clone().into_iter().map(|p| p.title).collect();
+					//Hardcoding the status types for consistency and uniformity
 					let entries_status = &["Abandoned", "Active", "Done"];
 					let selection_entries = Select::with_theme(&ColorfulTheme::default())
 						.with_prompt("Pick an entry to change status")
@@ -242,6 +256,7 @@ fn main() {
 		},
 
 		Some(Commands::Ls(flag)) => {
+			//Having <flag> as argument filters through the given category and status with -c and -s respectively
 			let entries = get_entries_with_flag(connection, flag);
 			match entries {
 				Ok(entries) => {
@@ -253,9 +268,9 @@ fn main() {
 						.interact();
 					match selection_entries {
 						Ok(selected) => {
-							println!("description: {}", entries.clone()[selected].description);
+							println!("Description: {}", entries.clone()[selected].description);
 							println!(
-								"title: {}, status : {}, type: {}",
+								"Title: {}, Status: {}, Category: {}",
 								entries[selected].title,
 								entries[selected].status,
 								entries[selected].category,
