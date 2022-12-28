@@ -1,6 +1,7 @@
 use crate::{
 	models::entry::{EditedEntry, Entry, NewEntry},
 	schema::todos::dsl,
+	Flag,
 };
 use diesel::prelude::*;
 use dotenvy::dotenv;
@@ -30,6 +31,34 @@ pub fn get_entries(conn: &mut MysqlConnection) -> Result<Vec<Entry>, diesel::res
 	dsl::todos.load::<Entry>(conn)
 }
 
+pub fn get_entries_with_flag(
+	conn: &mut MysqlConnection,
+	flag: Flag,
+) -> Result<Vec<Entry>, diesel::result::Error> {
+	let status = flag.status;
+	let category = flag.category;
+	let entries: Result<Vec<Entry>, diesel::result::Error>;
+
+	match (status, category) {
+		(Some(status), None) => {
+			entries = dsl::todos.filter(dsl::status.eq(status)).load::<Entry>(conn);
+		},
+		(Some(status), Some(category)) => {
+			entries = dsl::todos
+				.filter(dsl::status.eq(status))
+				.filter(dsl::category.eq(category))
+				.load::<Entry>(conn);
+		},
+		(None, Some(category)) => {
+			entries = dsl::todos.filter(dsl::category.eq(category)).load::<Entry>(conn);
+		},
+		(None, None) => {
+			entries = dsl::todos.load::<Entry>(conn);
+		},
+	}
+	entries
+}
+
 pub fn update_entry(conn: &mut MysqlConnection, entry_title: String, status: String) -> () {
 	diesel::update(dsl::todos)
 		.filter(dsl::title.eq(entry_title))
@@ -37,10 +66,14 @@ pub fn update_entry(conn: &mut MysqlConnection, entry_title: String, status: Str
 		.execute(conn)
 		.unwrap();
 }
-pub fn edit_entry(conn: &mut MysqlConnection, entry_title: String, new_entry: EditedEntry) -> () {
+pub fn edit_entry(
+	conn: &mut MysqlConnection,
+	entry_title: String,
+	updated_entry: EditedEntry,
+) -> () {
 	diesel::update(dsl::todos)
 		.filter(dsl::title.eq(entry_title))
-		.set::<EditedEntry>(new_entry)
+		.set::<EditedEntry>(updated_entry)
 		.execute(conn)
 		.unwrap();
 }

@@ -6,5 +6,6 @@ diesel::table! {
 		title -> Varchar,
 		description -> Text,
 		status -> Text,
+		category -> Text,
 	}
 }
