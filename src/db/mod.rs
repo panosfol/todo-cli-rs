@@ -10,22 +10,22 @@ use std::{env, fs};
 ///Connecting with the database that is running with Docker. Please set your .env according to the .env.example
 #[cfg(feature = "local_database")]
 pub fn establish_connection() -> MysqlConnection {
-    dotenv().ok();
+	dotenv().ok();
 
-    let database_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set");
-    MysqlConnection::establish(&database_url)
-	.unwrap_or_else(|_| panic!("Error connecting to {}", database_url))
+	let database_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set");
+	MysqlConnection::establish(&database_url)
+		.unwrap_or_else(|_| panic!("Error connecting to {}", database_url))
 }
 
 ///Connecting with the database that is running with Docker. If the app is being used for the first
 ///time, use the command <connect> with the correct url to configure the config.txt
 #[cfg(not(feature = "local_database"))]
 pub fn establish_connection() -> MysqlConnection {
-    dotenv().ok();
+	dotenv().ok();
 
-    let database_url = fs::read_to_string("./config.txt");
-    MysqlConnection::establish(&database_url.as_ref().unwrap())
-	.unwrap_or_else(|_| panic!("Error connecting to {}", database_url.unwrap()))
+	let database_url = fs::read_to_string("./config.txt");
+	MysqlConnection::establish(&database_url.as_ref().unwrap())
+		.unwrap_or_else(|_| panic!("Error connecting to {}", database_url.unwrap()))
 }
 
 ///Adds a new entry to the database

@@ -10,15 +10,14 @@ pub fn uppercase_converter(s: &mut String) {
 
 ///A function to check if the config.txt file that holds the url exists
 pub fn file_check() -> bool {
-    let mut _rs: bool = true;
+	let mut _rs: bool = true;
 
-    _rs = Path::new("./config.txt").exists();
+	_rs = Path::new("./config.txt").exists();
 
-    if _rs == true{
-        println!("File already exists");
-    }
-    else{
-        println!("File does not exist, creating file");
-    }
-    _rs
+	if _rs == true {
+		println!("File already exists");
+	} else {
+		println!("File does not exist, creating file");
+	}
+	_rs
 }
