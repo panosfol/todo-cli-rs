@@ -134,7 +134,8 @@ fn main() {
 					let entries_title: Vec<String> =
 						entries.clone().into_iter().map(|p| p.title).collect();
 					//Selectable fields are hardcoded, so that the entry fields will have consistency
-					let selectable_fields = &["Title", "Description", "Both"];
+					let selectable_fields = &["Title", "Description", "Category", "All"];
+					let selectable_categories = &["Fun", "Personal", "Work"];
 					let selection_entries = Select::with_theme(&ColorfulTheme::default())
 						.with_prompt("Pick an entry to edit")
 						.items(&entries_title[..])
@@ -190,6 +191,29 @@ fn main() {
 									}
 								},
 								2 => {
+									let selection_category =
+										Select::with_theme(&ColorfulTheme::default())
+											.with_prompt("Pick an entry to change category")
+											.items(&selectable_categories[..])
+											.interact()
+											.unwrap();
+									match selection_category {
+										0 => edited_entry.category = "Fun".to_string(),
+										1 => edited_entry.category = "Personal".to_string(),
+										2 => edited_entry.category = "Work".to_string(),
+										_ => (),
+									}
+
+									edited_entry.title = selected_title.to_string();
+									edited_entry.description = selected_desc.to_string();
+									edit_entry(
+										connection,
+										entries_title[selected].clone(),
+										edited_entry,
+									)
+								},
+
+								3 => {
 									println!("Give new title for chosen entry:");
 									match io::stdin().read_line(&mut edited_entry.title) {
 										Ok(_) => {},
@@ -202,14 +226,27 @@ fn main() {
 												edited_entry.title.trim().to_string();
 											edited_entry.description =
 												edited_entry.description.trim().to_string();
-											edit_entry(
-												connection,
-												entries_title[selected].clone(),
-												edited_entry,
-											);
 										},
 										Err(error) => println!("error: {}", error),
 									}
+									println!("Pick new category: ");
+									let selection_category =
+										Select::with_theme(&ColorfulTheme::default())
+											.with_prompt("Pick an entry to change category")
+											.items(&selectable_categories[..])
+											.interact()
+											.unwrap();
+									match selection_category {
+										0 => edited_entry.category = "Fun".to_string(),
+										1 => edited_entry.category = "Personal".to_string(),
+										2 => edited_entry.category = "Work".to_string(),
+										_ => (),
+									}
+									edit_entry(
+										connection,
+										entries_title[selected].clone(),
+										edited_entry,
+									);
 								},
 								_ => (),
 							}
