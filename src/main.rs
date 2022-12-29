@@ -8,10 +8,11 @@ use db::{
 	create_entry, delete_entry, edit_entry, establish_connection, get_entries,
 	get_entries_with_flag, update_entry,
 };
+
 use dialoguer::{theme::ColorfulTheme, Select};
 use models::entry::{EditedEntry, NewEntry};
-use std::io;
-use util::uppercase_converter;
+use std::{fs::File, io, io::Write};
+use util::{file_check, uppercase_converter};
 
 #[derive(Parser)]
 #[command(name = "TodoApp")]
@@ -38,7 +39,10 @@ pub enum Commands {
 	Delete,
 	/// Update the status of an entry
 	Status,
+	/// Establish connection with the database
+	Connect(Url),
 }
+
 #[derive(Parser, Debug)]
 pub struct Flag {
 	///Fetch only the entries type <CATEGORY>
@@ -49,12 +53,18 @@ pub struct Flag {
 	status: Option<String>,
 }
 
+#[derive(Parser, Debug)]
+pub struct Url {
+	#[arg(long)]
+	url: String,
+}
+
 fn main() {
-	let connection = &mut establish_connection();
 	let cli = Cli::parse();
 	//This is where the main function of the app takes place
 	match cli.command {
 		Some(Commands::New(flag)) => {
+			let connection = &mut establish_connection();
 			let mut new_entry = NewEntry::default();
 			//Matching the flag struct to parse the category of the new entry
 			match flag.category {
@@ -100,6 +110,7 @@ fn main() {
 		},
 
 		Some(Commands::Delete) => {
+			let connection = &mut establish_connection();
 			//Fetching all the entries to develop the selectable menu
 			let entries = get_entries(connection);
 			//Matching the "entries" vector because the load function of the diesel returns result
@@ -127,6 +138,7 @@ fn main() {
 			}
 		},
 		Some(Commands::Edit) => {
+			let connection = &mut establish_connection();
 			let entries = get_entries(connection);
 			match entries {
 				Ok(entries) => {
@@ -263,6 +275,7 @@ fn main() {
 		},
 
 		Some(Commands::Status) => {
+			let connection = &mut establish_connection();
 			let entries = get_entries(connection);
 			match entries {
 				Ok(entries) => {
@@ -293,6 +306,7 @@ fn main() {
 		},
 
 		Some(Commands::Ls(flag)) => {
+			let connection = &mut establish_connection();
 			//Having <flag> as argument filters through the given category and status with -c and -s respectively
 			let entries = get_entries_with_flag(connection, flag);
 			match entries {
@@ -323,6 +337,22 @@ fn main() {
 				},
 			}
 		},
+
+		//This is to be used once, after installing the app
+		Some(Commands::Connect(url)) =>
+			if !file_check() {
+				let mut file =
+					File::create("./config.txt").expect("Error while creating the file!");
+				let s = format!("{}", url.url);
+				match file.write_all(s.as_bytes()) {
+					Ok(_) => {
+						println!("File created succesfully");
+					},
+					Err(error) => {
+						println!("{}", error);
+					},
+				}
+			},
 		None => {},
 	};
 }

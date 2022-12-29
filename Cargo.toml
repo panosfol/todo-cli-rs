@@ -10,3 +10,5 @@ clap = { version = "4.0.18", features = ["derive"] }
 dialoguer = "0.10.2"
 diesel = { version = "2.0.0", features = ["mysql"] }
 dotenvy = "0.15"
+[features]
+local_database = []
