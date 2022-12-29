@@ -24,12 +24,12 @@ pub fn establish_connection() -> MysqlConnection {
 	dotenv().ok();
 
 	let database_url = fs::read_to_string("./config.txt");
-	MysqlConnection::establish(&database_url.as_ref().unwrap())
+	MysqlConnection::establish(database_url.as_ref().unwrap())
 		.unwrap_or_else(|_| panic!("Error connecting to {}", database_url.unwrap()))
 }
 
 ///Adds a new entry to the database
-pub fn create_entry(conn: &mut MysqlConnection, new_entry: NewEntry) -> () {
+pub fn create_entry(conn: &mut MysqlConnection, new_entry: NewEntry) {
 	diesel::insert_into(dsl::todos)
 		.values(&new_entry)
 		.execute(conn)
@@ -37,7 +37,7 @@ pub fn create_entry(conn: &mut MysqlConnection, new_entry: NewEntry) -> () {
 }
 
 ///Deletes an entry from the database
-pub fn delete_entry(conn: &mut MysqlConnection, entry_title: String) -> () {
+pub fn delete_entry(conn: &mut MysqlConnection, entry_title: String) {
 	diesel::delete(dsl::todos.filter(dsl::title.eq(entry_title)))
 		.execute(conn)
 		.unwrap();
@@ -56,30 +56,21 @@ pub fn get_entries_with_flag(
 ) -> Result<Vec<Entry>, diesel::result::Error> {
 	let status = flag.status;
 	let category = flag.category;
-	let entries: Result<Vec<Entry>, diesel::result::Error>;
 
-	match (status, category) {
-		(Some(status), None) => {
-			entries = dsl::todos.filter(dsl::status.eq(status)).load::<Entry>(conn);
-		},
-		(Some(status), Some(category)) => {
-			entries = dsl::todos
-				.filter(dsl::status.eq(status))
-				.filter(dsl::category.eq(category))
-				.load::<Entry>(conn);
-		},
-		(None, Some(category)) => {
-			entries = dsl::todos.filter(dsl::category.eq(category)).load::<Entry>(conn);
-		},
-		(None, None) => {
-			entries = dsl::todos.load::<Entry>(conn);
-		},
-	}
+	let entries: Result<Vec<Entry>, diesel::result::Error> = match (status, category) {
+		(Some(status), None) => dsl::todos.filter(dsl::status.eq(status)).load::<Entry>(conn),
+		(Some(status), Some(category)) => dsl::todos
+			.filter(dsl::status.eq(status))
+			.filter(dsl::category.eq(category))
+			.load::<Entry>(conn),
+		(None, Some(category)) => dsl::todos.filter(dsl::category.eq(category)).load::<Entry>(conn),
+		(None, None) => dsl::todos.load::<Entry>(conn),
+	};
 	entries
 }
 
 ///Updates the status of a specific entry
-pub fn update_entry(conn: &mut MysqlConnection, entry_title: String, status: String) -> () {
+pub fn update_entry(conn: &mut MysqlConnection, entry_title: String, status: String) {
 	diesel::update(dsl::todos)
 		.filter(dsl::title.eq(entry_title))
 		.set(dsl::status.eq(status))
@@ -88,11 +79,7 @@ pub fn update_entry(conn: &mut MysqlConnection, entry_title: String, status: Str
 }
 
 ///Edits the title or the description of a specific entry
-pub fn edit_entry(
-	conn: &mut MysqlConnection,
-	entry_title: String,
-	updated_entry: EditedEntry,
-) -> () {
+pub fn edit_entry(conn: &mut MysqlConnection, entry_title: String, updated_entry: EditedEntry) {
 	diesel::update(dsl::todos)
 		.filter(dsl::title.eq(entry_title))
 		.set::<EditedEntry>(updated_entry)

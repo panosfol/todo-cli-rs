@@ -279,8 +279,7 @@ fn main() {
 			let entries = get_entries(connection);
 			match entries {
 				Ok(entries) => {
-					let entries_title: Vec<String> =
-						entries.clone().into_iter().map(|p| p.title).collect();
+					let entries_title: Vec<String> = entries.into_iter().map(|p| p.title).collect();
 					//Hardcoding the status types for consistency and uniformity
 					let entries_status = &["Abandoned", "Active", "Done"];
 					let selection_entries = Select::with_theme(&ColorfulTheme::default())
@@ -319,7 +318,7 @@ fn main() {
 						.interact();
 					match selection_entries {
 						Ok(selected) => {
-							println!("Description: {}", entries.clone()[selected].description);
+							println!("Description: {}", entries[selected].description);
 							println!(
 								"Title: {}, Status: {}, Category: {}",
 								entries[selected].title,
@@ -343,7 +342,7 @@ fn main() {
 			if !file_check() {
 				let mut file =
 					File::create("./config.txt").expect("Error while creating the file!");
-				let s = format!("{}", url.url);
+				let s = url.url;
 				match file.write_all(s.as_bytes()) {
 					Ok(_) => {
 						println!("File created succesfully");
