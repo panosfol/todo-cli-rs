@@ -5,7 +5,9 @@ use crate::{
 };
 use diesel::prelude::*;
 use dotenvy::dotenv;
-use std::{env, fs};
+#[cfg(feature = "local_database")]
+use std::env;
+use std::fs;
 
 ///Connecting with the database that is running with Docker. Please set your .env according to the .env.example
 #[cfg(feature = "local_database")]
