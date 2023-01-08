@@ -22,7 +22,7 @@ diesel setup
 diesel migrations generate
 ```
 
-### Use connect --url <string> command with the url as argument. Read .env.example for the correct format
+*Use connect --url <string> command with the url as argument. Read .env.example for the correct format*
 
 ## Example commands
 #### Creating new entry with and without the category given
